@@ -3,25 +3,28 @@ import java.util.PriorityQueue
 var count = 100000
 var tempoGlobal: Double = 2.0
 val filaCapacidade = 5
-val servidores = 1
+val servidores = 2
 var filaCount = 0
 var perdaCount = 0
 val minChegada = 2
 val maxChegada = 5
-val minSaida = 2
+val minSaida = 3
 val maxSaida = 5
 val tempoNClientesFila = MutableList(filaCapacidade + 1) { 0.0 }
-val escalonador = PriorityQueue<Evento>(Comparator.reverseOrder())
+val escalonador = PriorityQueue<Evento>()
 
 fun main(args: Array<String>) {
+
     var eventoAnteriorTempoGlobal = tempoGlobal
+    tempoNClientesFila[0] += tempoGlobal
     escalonador.add(Evento(TIPO_EVENTO.CHEGADA, tempoDemandado(TIPO_EVENTO.CHEGADA)))
 
     while (count > 0) {
         val evento = proximoEvento()
 
-        var tempoDeDiferença = evento.tempo - eventoAnteriorTempoGlobal
-        tempoNClientesFila[filaCount] = tempoDeDiferença
+        var tempoDeDiferenca = evento.tempo - eventoAnteriorTempoGlobal
+        eventoAnteriorTempoGlobal = evento.tempo
+        tempoNClientesFila[filaCount] += tempoDeDiferenca
 
         if (evento.tipo == TIPO_EVENTO.CHEGADA) {
             chegada(evento)
@@ -34,6 +37,7 @@ fun main(args: Array<String>) {
     println("tempo global: $tempoGlobal")
     println("perdas: $perdaCount")
     tempoNClientesFila.forEachIndexed { index, tempo ->
+        println()
         println("pessoas na fila: $index ")
         println("tempo: $tempo")
         println("porcentagem de tempo: ${(tempo/tempoGlobal) * 100}%")
@@ -97,9 +101,9 @@ fun tempoDemandado(tipoEvento: TIPO_EVENTO): Double {
         b = maxSaida
     }
     val test = GeradorDeNumero.aleatorio()
-    return a + ((b - a) * test)
+    val resultado = a + ((b - a) * test)
+    return resultado
 }
-
 data class Evento(val tipo: TIPO_EVENTO, val tempo: Double) : Comparable<Evento> {
 
     override fun compareTo(other: Evento): Int {
